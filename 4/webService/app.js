@@ -116,7 +116,7 @@ apiServer.add_route(ROUTES.DEFINITION + "/", (req, res) => {
     apiServer.numberOfReq++;
     res.writeHead(200, { "Content-Type": "application/json" });
     res.end(
-      JSON.stringify({ word: definition, numberOfReq: apiServer.numberOfReq })
+      JSON.stringify({ [word]: definition, numberOfReq: apiServer.numberOfReq })
     );
   } else {
     res.writeHead(404, { "Content-Type": "application/json" });
