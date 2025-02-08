@@ -30,10 +30,23 @@ class APIServer {
     const server = http.createServer((req, res) => {
       const parsedUrl = url.parse(req.url, true);
       const routeHandler = this.routes[parsedUrl.pathname];
+
+      // Handle CORS preflight request
+      if (req.method === "OPTIONS") {
+        res.writeHead(204, {
+          "Content-Type": "text/plain",
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type",
+        });
+        res.end();
+        return;
+      }
+
       if (routeHandler) {
         routeHandler(req, res);
       } else {
-        res.writeHead(404, { "Content-Type": "text/plain" });
+        res.writeHead(404, { "Content-Type": "text/plain", "Access-Control-Allow-Origin": "*" });
         res.write("404 Not Found");
         res.end();
       }
@@ -59,13 +72,13 @@ apiServer.add_route(ROUTES.DEFINITION, (req, res) => {
       const definition = data.definition;
 
       if (!word || !definition) {
-        res.writeHead(400, { "Content-Type": "application/json" });
+        res.writeHead(400, { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" });
         res.end(JSON.stringify({ error: "Word and definition are required" }));
         return;
       }
 
       if (apiServer.dictionary.dict[word]) {
-        res.writeHead(400, { "Content-Type": "application/json" });
+        res.writeHead(400, { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" });
         res.end(
           JSON.stringify({
             error: "Warning! Such word already exists in the dictionary",
@@ -87,14 +100,14 @@ apiServer.add_route(ROUTES.DEFINITION, (req, res) => {
         New entry recorded:
         
         "${word}:${definition}"`;
-      res.writeHead(201, { "Content-Type": "application/json" });
+      res.writeHead(201, { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" });
       res.end(
         JSON.stringify({
           message: response,
         })
       );
     } catch (error) {
-      res.writeHead(400, { "Content-Type": "application/json" });
+      res.writeHead(400, { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" });
       res.end(JSON.stringify({ error: error }));
     }
   });
@@ -105,7 +118,7 @@ apiServer.add_route(ROUTES.DEFINITION + "/", (req, res) => {
   const word = parsedUrl.query.word;
 
   if (!word) {
-    res.writeHead(400, { "Content-Type": "application/json" });
+    res.writeHead(400, { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" });
     res.end(JSON.stringify({ error: "Word parameter is required" }));
     return;
   }
@@ -114,7 +127,7 @@ apiServer.add_route(ROUTES.DEFINITION + "/", (req, res) => {
 
   if (definition) {
     apiServer.numberOfReq++;
-    res.writeHead(200, { "Content-Type": "application/json" });
+    res.writeHead(200, { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" });
     res.end(
       JSON.stringify({
         word: word,
@@ -123,7 +136,7 @@ apiServer.add_route(ROUTES.DEFINITION + "/", (req, res) => {
       })
     );
   } else {
-    res.writeHead(404, { "Content-Type": "application/json" });
+    res.writeHead(404, { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" });
     res.end(JSON.stringify({ message: "Word not found" }));
   }
 });
