@@ -23,7 +23,7 @@ class Search {
         }
 
         const xhttp = new XMLHttpRequest();
-        xhttp.open("GET", `http://localhost:8080/api/definitions/?word=${word}`, true);
+        xhttp.open("GET", `https://comp-4537-qdmp.onrender.com/api/definitions/?word=${word}`, true);
         xhttp.send();
         xhttp.onreadystatechange = () => {
             if (xhttp.readyState == 4 && xhttp.status == 200) {
@@ -71,7 +71,7 @@ class Store {
         }
 
         const xhttp = new XMLHttpRequest();
-        xhttp.open("POST", "http://localhost:8080/api/definitions", true);
+        xhttp.open("POST", "https://comp-4537-qdmp.onrender.com/api/definitions", true);
         xhttp.setRequestHeader("Content-Type", "application/json");
         xhttp.send(JSON.stringify({ word: word, definition: definition }));
         xhttp.onreadystatechange = () => {
