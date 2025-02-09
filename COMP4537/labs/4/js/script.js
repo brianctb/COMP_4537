@@ -1,3 +1,5 @@
+import { en } from "../lang/messages/en/user.js";
+
 class Search {
     constructor() {
         this.word = document.getElementById("SearchInput");
@@ -18,7 +20,7 @@ class Search {
     search() {
         let word = this.word.value;
         if (word === "") {
-            this.displayError("Please enter a word to search");
+            this.displayError(en.SearchErrorMessage);
             return;
         }
 
@@ -66,7 +68,7 @@ class Store {
         let word = this.word.value;
         let definition = this.definition.value;
         if (word === "" || definition === "") {
-            this.displayError("Please enter a word and definition to store");
+            this.displayError(en.StoreErrorMessage);
             return;
         }
 
@@ -91,6 +93,18 @@ class Store {
         });
     }
 }
+
+document.getElementById("DocumentTitle").innerHTML = en.DocumentTitle;
+
+document.getElementById("PageTitle").innerHTML = en.PageTitle;
+document.getElementById("SearchTitle").innerHTML = en.SearchTitle;
+document.getElementById("SearchWordLabel").innerHTML = en.WordLabel;
+document.getElementById("SearchButton").innerHTML = en.SearchButton;
+
+document.getElementById("StoreTitle").innerHTML = en.StoreTitle;
+document.getElementById("StoreWordLabel").innerHTML = en.WordLabel;
+document.getElementById("StoreDefinitionLabel").innerHTML = en.DefinitionLabel;
+document.getElementById("StoreButton").innerHTML = en.StoreButton;
 
 const search = new Search();
 search.addSearchListener();
