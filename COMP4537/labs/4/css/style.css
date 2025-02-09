@@ -1,0 +1,13 @@
+.DictionaryContainer {
+    background-color: lightcyan;
+    padding: 1em;
+    margin: 1em;
+    border-width: 1px;
+    border-radius: 5px;
+    border-style: solid;
+    border-color: black;
+}
+
+h1 {
+    text-align: center;
+}

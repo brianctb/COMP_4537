@@ -31,7 +31,6 @@ class APIServer {
       const parsedUrl = url.parse(req.url, true);
       const routeHandler = this.routes[parsedUrl.pathname];
 
-      // Handle CORS preflight request
       if (req.method === "OPTIONS") {
         res.writeHead(204, {
           "Content-Type": "text/plain",
