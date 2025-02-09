@@ -24,6 +24,11 @@ class Search {
             return;
         }
 
+        if (/\d/.test(word)) {
+            this.displayError(`Word ${en.NumberErrorMessage}`);
+            return;
+        }
+
         const xhttp = new XMLHttpRequest();
         xhttp.open("GET", `https://comp-4537-qdmp.onrender.com/api/definitions/?word=${word}`, true);
         xhttp.send();
@@ -69,6 +74,11 @@ class Store {
         let definition = this.definition.value;
         if (word === "" || definition === "") {
             this.displayError(en.StoreErrorMessage);
+            return;
+        }
+
+        if (/\d/.test(word) || /\d/.test(definition)) {
+            this.displayError(`Word and Definition ${en.NumberErrorMessage}`);
             return;
         }
 

@@ -9,4 +9,5 @@ export const en = {
     StoreTitle: "Store a word in the Dictionary",
     StoreButton: "Store",
     StoreErrorMessage: "Please enter a word and definition to store",
+    NumberErrorMessage: "cannot contain numbers"
 }
