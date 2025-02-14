@@ -217,7 +217,6 @@ class APIServer {
   async start() {
     try {
       await this.database.connect();
-      await this.database.dropPatientTable();
       await this.database.createPatientTable();
       const server = http.createServer(async (req, res) => {
         console.log("Server Started");
@@ -242,7 +241,6 @@ class APIServer {
       });
     } catch (error) {
       console.error("Error starting the API server:", error);
-      throw error;
     }
   }
 }
