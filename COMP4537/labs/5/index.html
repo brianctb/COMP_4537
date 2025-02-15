@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title id="DocumentTitle"></title>
+        <link rel="stylesheet" href="./server1/css/style.css">
+    </head>
+    <body>
+        <h1 id="PageTitle"></h1>
+
+        <!-- Default Data Section -->
+        <div id="InserDefaultDataContainer" class="SectionContainer">
+            <h2 id="DefaultDataTitle"></h2>
+            <button id="DefaultDataButton"></button>
+            <br/><br/>
+            <div id="DefaultDataMsg" class="SectionResults"></div>
+        </div>
+
+        <!-- TextArea Section to Insert and Select rows from DB -->
+        <div id="TextAreaContainer" class="SectionContainer">
+            <h2 id="TextAreaTitle"></h2>
+            <label for="TextAreaInput" id="TextAreaLabel"></label><br/>
+            <textarea id="TextAreaInput" placeholder="Enter a SQL query"></textarea>
+            <br/><br/>
+            <button id="TextAreaButton"></button>
+            <br/><br/>
+        <div id="TextAreaResults" class="SectionResults"></div>
+
+
+        <script src="./server1/js/script.js" type="module"></script>
+    </body>
+</html>
