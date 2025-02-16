@@ -1,4 +1,4 @@
-// Code assisted with ChatGBT
+// Code assisted with ChatGPT
 
 const mysql = require("mysql2/promise");
 const http = require("http");
@@ -161,10 +161,14 @@ class APIServer {
 
     req.on("end", async () => {
       try {
-        const data = JSON.parse(body);
-
-        for (const person of data) {
-          await this.database.addSameplePatients(person.name, person.dob);
+        if (body.toLowerCase().includes("insert")) {
+          const sqlQuery = body.trim().replace(/^"|"$/g, '');
+          await this.database.runQuery(sqlQuery);
+        } else {
+          const data = JSON.parse(body);
+          for (const person of data) {
+            await this.database.addSameplePatients(person.name, person.dob);
+          }
         }
 
         res.writeHead(200, {
