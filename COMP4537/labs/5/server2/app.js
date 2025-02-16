@@ -1,9 +1,9 @@
+// Code assisted with ChatGBT
+
 const mysql = require("mysql2/promise");
 const http = require("http");
 const url = require("url");
-const people = require("./sample");
 const routes = require("./route");
-const { exitCode } = require("process");
 
 class Database {
   constructor() {
@@ -105,7 +105,7 @@ class APIServer {
   }
 
   sqlGetHandler = async (req, res) => {
-    if (req.method !== "GET") {
+    if (req.method !== "GET" && req.method !== "POST") {
       res.writeHead(405, {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
@@ -115,14 +115,13 @@ class APIServer {
     }
     try {
       const parsedUrl = url.parse(req.url, true);
-      // const path = decodeURIComponent(parsedUrl.pathname);
       const sqlQuery = parsedUrl.query.query ? parsedUrl.query.query : null;
       if (sqlQuery) {
+        const [rows, dbInfo] = await this.database.runQuery(sqlQuery);
         res.writeHead(200, {
           "Content-Type": "application/json",
           "Access-Control-Allow-Origin": "*",
         });
-        const [rows, dbInfo] = await this.database.runQuery(sqlQuery);
         res.write(JSON.stringify({ rows: rows }));
         res.end();
       } else {
@@ -145,26 +144,6 @@ class APIServer {
     }
   };
 
-  sqlPostHandler = async (req, res) => {
-    if (req.method !== "POST") {
-      res.writeHead(405, {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-      });
-      res.end(JSON.stringify({ error: "Method Not Allowed" }));
-      return;
-    }
-    for (const person of people) {
-      await this.database.addSameplePatients(person.name, person.dob);
-    }
-    res.writeHead(200, {
-      "Content-Type": "application/json",
-      "Access-Control-Allow-Origin": "*",
-    });
-    res.write(JSON.stringify({ message: "Data added to db successfully" }));
-    res.end();
-  };
-
   sqlClientSampleHandler = async (req, res) => {
     if (req.method !== "POST") {
       res.writeHead(405, {
@@ -174,44 +153,40 @@ class APIServer {
       res.end(JSON.stringify({ error: "Method Not Allowed" }));
       return;
     }
+
     let body = "";
     req.on("data", (chunk) => {
       body += chunk.toString();
     });
+
     req.on("end", async () => {
       try {
         const data = JSON.parse(body);
+
         for (const person of data) {
           await this.database.addSameplePatients(person.name, person.dob);
         }
+
         res.writeHead(200, {
           "Content-Type": "application/json",
           "Access-Control-Allow-Origin": "*",
         });
-        res.write(JSON.stringify({ message: "Data added to db successfully" }));
-        res.end();
+        res.end(JSON.stringify({ message: "Data added to db successfully" }));
       } catch (error) {
+        console.error(error);
+
         res.writeHead(400, {
           "Content-Type": "application/json",
           "Access-Control-Allow-Origin": "*",
         });
-        res.write(JSON.stringify({ error: "Invalid data format" }));
-        res.end();
+        res.end(
+          JSON.stringify({
+            error: "Invalid data format or database error",
+            message: error.message,
+          })
+        );
       }
     });
-  };
-
-  checkPreFlight = (req, res) => {
-    if (req.method === "OPTIONS") {
-      res.writeHead(204, {
-        "Content-Type": "text/plain",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type",
-      });
-      res.end();
-      return;
-    }
   };
 
   async start() {
@@ -219,11 +194,19 @@ class APIServer {
       await this.database.connect();
       await this.database.createPatientTable();
       const server = http.createServer(async (req, res) => {
-        console.log("Server Started");
         const parsedUrl = url.parse(req.url, true);
         const routeHandler = this.routes[parsedUrl.pathname];
 
-        this.checkPreFlight(req, res);
+        if (req.method === "OPTIONS") {
+          res.writeHead(204, {
+            "Content-Type": "text/plain",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type",
+          });
+          res.end();
+          return;
+        }
 
         if (routeHandler) {
           routeHandler(req, res);
