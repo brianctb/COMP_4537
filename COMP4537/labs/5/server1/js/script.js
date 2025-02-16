@@ -25,28 +25,51 @@ class Client {
         this.textAreaResults = document.getElementById("TextAreaResults");
     }
 
-    displaySuccessMessage(message) {
+    displayTextAreaSuccessMessage(message) {
         this.textAreaResults.style.color = "black";
         this.textAreaResults.innerHTML = message;
     }
 
-    displayError(message) {
+    displayDefaultDataSuccessMessage(message) {
+        this.defaultDataMsg.style.color = "black";
+        this.defaultDataMsg.innerHTML = message;
+    }
+
+    displayTextAreaError(message) {
+        this.textAreaResults.style.color = "red";
+        this.textAreaResults.innerHTML = `${message}`;
+    }
+
+    displayDefaultDataError(message) {
         this.textAreaResults.style.color = "red";
         this.textAreaResults.innerHTML = `${message}`;
     }
 
     displayRows(rows) {
         this.textAreaResults.style.color = "black";
-        let table =
-        "<table border='1'><tr><th>Patient ID</th><th>Name</th><th>Date of Birth</th></tr>";
-        rows.forEach((row) => {
-        table += `<tr>
-                    <td>${row.patientid}</td>
-                    <td>${row.name}</td>
-                    <td>${new Date(row.dateOfBirth).toLocaleDateString()}</td>
-                    </tr>`;
+        // Get the column names from the keys of the first object
+        const columns = Object.keys(rows[0]);
+
+        // Create the table headers
+        let table = "<table class='SelectResultsTable'><tr>";
+        columns.forEach(column => {
+            table += `<th>${column}</th>`;
+        });
+        table += "</tr>";
+
+        // Create the table rows
+        rows.forEach(row => {
+            table += "<tr>";
+            columns.forEach(column => {
+                if (column === "dateOfBirth") {
+                    row[column] = new Date(row[column]).toLocaleDateString();
+                }
+                table += `<td>${row[column]}</td>`;
+            });
+            table += "</tr>";
         });
         table += "</table>";
+
         this.textAreaResults.innerHTML = table;
     }
 
@@ -55,7 +78,6 @@ class Client {
         xhttp.open(
             "POST",
             `https://comp-4537-1-xeb8.onrender.com/api/v1/sql`,
-            // `http://localhost:8080/api/v1/sql`,
             true
         );
         xhttp.setRequestHeader("Content-Type", "application/json");
@@ -65,10 +87,10 @@ class Client {
         xhttp.onreadystatechange = () => {
             if (xhttp.readyState == 4 && xhttp.status == 200) {
                 let response = JSON.parse(xhttp.responseText);
-                this.displaySuccessMessage(response.message);
+                this.displayDefaultDataSuccessMessage(response.message);
             } else if (xhttp.readyState == 4 && xhttp.status == 404) {
                 let response = JSON.parse(xhttp.responseText);
-                this.displayError(response.error);
+                this.displayDefaultDataError(response.error);
             }
         };
     }
@@ -76,7 +98,7 @@ class Client {
     submitQuery() {
         let query = this.textArea.value;
         if (query === "") {
-            this.displayError("Please enter a SQL query");
+            this.displayTextAreaError(en.NoSQLMessage);
             return;
         }
 
@@ -86,7 +108,7 @@ class Client {
         } else if (query.toLowerCase().includes("select")) {
             this.selectData(query);
         } else {
-            this.displayError("Error: Invalid SQL query");
+            this.displayTextAreaError(`Error: ${en.InvalidSQLMessage}`);
         }
     }
 
@@ -94,8 +116,7 @@ class Client {
         const xhttp = new XMLHttpRequest();
         xhttp.open(
             "POST",
-            `https://comp-4537-1-xeb8.onrender.com/api/v1/sql/`,
-            // `http://localhost:8080/api/v1/sql`,
+            `https://comp-4537-1-xeb8.onrender.com/api/v1/sql`,
             true
         );
         xhttp.setRequestHeader("Content-Type", "application/json");
@@ -105,10 +126,10 @@ class Client {
         xhttp.onreadystatechange = () => {
             if (xhttp.readyState == 4 && xhttp.status == 200) {
                 let response = JSON.parse(xhttp.responseText);
-                this.displaySuccessMessage(response.message);
+                this.displayTextAreaSuccessMessage(response.message);
             } else if (xhttp.readyState == 4 && xhttp.status == 400) {
                 let response = JSON.parse(xhttp.responseText);
-                this.displayError(response.error);
+                this.displayTextAreaError(response.message);
             }
         };
     }
@@ -127,7 +148,10 @@ class Client {
                 this.displayRows(response.rows);
             } else if (xhttp.readyState == 4 && xhttp.status == 400) {
                 let response = JSON.parse(xhttp.responseText);
-                this.displayError(response.error);
+                this.displayTextAreaError(response.error);
+            } else if (xhttp.readyState == 4 && xhttp.status == 500) {
+                let response = JSON.parse(xhttp.responseText);
+                this.displayTextAreaError(response.message.message);
             }
         };
     }

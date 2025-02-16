@@ -5,4 +5,6 @@ export const en = {
     DefaultDataButton: "Insert Default Data",
     TextAreaTitle: "Enter a SQL query here to either Insert or Select data",
     TextAreaButton: "Submit",
+    InvalidSQLMessage: "Invalid SQL query",
+    NoSQLMessage: "Please enter a SQL query",
 }
