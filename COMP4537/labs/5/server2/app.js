@@ -14,8 +14,8 @@ class Database {
     try {
       this.connection = await mysql.createConnection({
         host: "viaduct.proxy.rlwy.net",
-        user: "root",
-        password: "SavaUkIanoKgWlxScsQtZzrBOmChPJVB",
+        user: "taylor",
+        password: "ilove3800",
         database: "railway",
         port: 16788,
       });
@@ -114,6 +114,7 @@ class APIServer {
       return;
     }
     try {
+      await this.database.createPatientTable();
       const parsedUrl = url.parse(req.url, true);
       const sqlQuery = parsedUrl.query.query ? parsedUrl.query.query : null;
       if (sqlQuery) {
@@ -160,9 +161,10 @@ class APIServer {
     });
 
     req.on("end", async () => {
+      await this.database.createPatientTable();
       try {
         if (body.toLowerCase().includes("insert")) {
-          const sqlQuery = body.trim().replace(/^"|"$/g, '');
+          const sqlQuery = body.trim().replace(/^"|"$/g, "");
           await this.database.runQuery(sqlQuery);
         } else {
           const data = JSON.parse(body);
